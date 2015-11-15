@@ -1,50 +1,32 @@
 #!/bin/python
-import graph as gl
+import aco
+import errno, sys
+import getopt
+
+
+def usage():
+    print 'example: main.py -f entrada.txt'
+    sys.exit(0)
+
+
+__author__ = 'Waner Miranda'
+
+
+def main():
+    try:
+        arg_list = sys.argv[1:]
+        opts, args = getopt.getopt(arg_list, 'f:h', ['dataset_file=', 'help'])
+    except getopt.GetoptError:
+        usage()
+        raise
+    for opt, arg in opts:
+        if opt == '-h':
+            usage()
+        elif opt in ("-f", "--dataset_file"):
+            dataset_file = arg
+
+    aco.Solver(dataset_file)
 
 if __name__ == "__main__":
+    main()
 
-    g = { "a" : ["d"],
-          "b" : ["c"],
-          "c" : ["b", "c", "d", "e"],
-          "d" : ["a", "c"],
-          "e" : ["c"],
-          "f" : []
-        }
-    gw = { "a" : [1],
-          "b" : [4],
-          "c" : [3, 7, 6, 8],
-          "d" : [2, 5],
-          "e" : [9],
-          "f" : []
-        }
-
-
-    graph = gl.WeightedGraph(g, gw)
-
-    print("Vertices of graph:")
-    print(graph.vertices())
-
-    print("Edges of graph:")
-    print(graph.edges())
-
-    print("Add vertex:")
-    graph.add_vertex("z")
-
-    print("Vertices of graph:")
-    print(graph.vertices())
- 
-    print("Add an edge:")
-    graph.add_edge({"a","z"},2.1)
-    
-    print("Vertices of graph:")
-    print(graph.vertices())
-
-    print("Edges of graph:")
-    print(graph.edges())
-
-    print('Adding an edge {"x","y"} with new vertices:')
-    graph.add_edge({"x","y"}, 2.4)
-    print("Vertices of graph:")
-    print(graph.vertices())
-    print("Edges of graph:")
-    print(graph.edges())
