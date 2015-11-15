@@ -1,13 +1,15 @@
 from ant import Ant
 import graph as gl
+import processhelper as ph
 
 __author__ = 'Waner Miranda'
+__email__ = 'waner@dcc.ufmg.br'
 
 
-class Solver:
+class Solver(object):
     def __init__(self, dataset_file):
         print "Loading dataset_file: ", dataset_file
-
+        self._counter = 0
         header = 0
         graph = gl.WeightedGraph()
         self._graph = graph
@@ -59,12 +61,19 @@ class Solver:
 
         assert len(vertices) == self._vertex_count
         assert len(edges) == edges_read
+
+        self._total_edges = len(edges)
+        self._total_vertices = len(vertices)
+
         assert (self._start in vertices) and (self._end in vertices)
 
-        ant = Ant(self)
-        last_step = -1
+        self._anthill = []
+        for pos in range(self._total_edges):
+            self._anthill.append(Ant(self))
+
+        """last_step = -1
         while last_step is not None:
-            last_step = ant.step_ahead()
+            last_step = ant.step_ahead() """
 
     def get_possible_moves(self, vertex, visited):
         return self._graph.get_edges(vertex, visited)
@@ -77,3 +86,14 @@ class Solver:
 
     def get_weight(self, v1, v2):
         return self._graph.get_weight(v1, v2)
+
+    def evaluate(self, part, parts, thread_id):
+        print 'Thread id:', thread_id, ' Starting:', part
+        size = len(self._anthill) / parts
+        range_max = size * part if part != parts else len(self._anthill)
+        range_start = size * (part - 1)
+        for ant_idx in range(range_start, range_max):
+            ant = self._anthill[ant_idx]
+            last_step = -1
+            while last_step is not None:
+                last_step = ant.step_ahead()

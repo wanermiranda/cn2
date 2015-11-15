@@ -1,15 +1,17 @@
 #!/bin/python
+import multiprocessing
 import aco
+import processhelper as ph
 import errno, sys
 import getopt
 
+__author__ = 'Waner Miranda'
+__email__ = 'waner@dcc.ufmg.br'
+
 
 def usage():
-    print 'example: main.py -f entrada.txt'
+    print 'example: main.py -f input.txt'
     sys.exit(0)
-
-
-__author__ = 'Waner Miranda'
 
 
 def main():
@@ -25,8 +27,16 @@ def main():
         elif opt in ("-f", "--dataset_file"):
             dataset_file = arg
 
-    aco.Solver(dataset_file)
+    ph.SolverManager.register('Solver', aco.Solver, ph.SolverProxy)
+    manager = ph.SolverManager()
+    manager.start()
+    solver = manager.Solver(dataset_file)
+    pool = multiprocessing.Pool(multiprocessing.cpu_count())
+    parts = 4
+    for iteration in range(100):
+        for part in range(1, parts):
+            pool.apply(func=ph.evaluate, args=(solver, part, parts))
+
 
 if __name__ == "__main__":
     main()
-

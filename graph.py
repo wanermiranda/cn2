@@ -1,7 +1,6 @@
-""" A Python Class
-A simple Python graph class, demonstrating the essential 
-facts and functionalities of graphs.
-"""
+__author__ = 'Waner Miranda'
+__email__ = 'waner@dcc.ufmg.br'
+
 DEFAULT_TAU_VALUE = 1
 
 class WeightedGraph(object):

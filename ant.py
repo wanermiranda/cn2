@@ -3,7 +3,9 @@ import random
 import numpy as np
 BETA = 1
 ALPHA = 2
-__author__ = 'gorigan'
+
+__author__ = 'Waner Miranda'
+__email__ = 'waner@dcc.ufmg.br'
 
 
 class Ant:
