@@ -5,11 +5,12 @@ DEFAULT_TAU_VALUE = 1
 
 class WeightedGraph(object):
 
-    def __init__(self):
+    def __init__(self, evaporating_rate=0.0):
         """ initializes a graph object """
         self._graph_dict = {}
         self._graph_dict_weights = {}
         self._graph_dict_tau = {}
+        self._evaporating_rate = evaporating_rate
 
     def vertices(self):
         """ returns the vertices of a graph """
@@ -91,5 +92,19 @@ class WeightedGraph(object):
             if v2 == v:
                 return self._graph_dict_weights[v1][pos]
         return None
+
+    def update_tau(self, ant):
+        path = ant.get_path()
+        path_cost = ant.get_path_cost()
+        for idx in range(len(path) - 1):
+            src_vertex = path[idx]
+            dst_vertex = path[idx + 1]
+            for target_idx, target_vertex in enumerate(self._graph_dict[src_vertex]):
+                if target_vertex == dst_vertex:
+                    self._graph_dict_tau[src_vertex][target_idx] *= (1 - self._evaporating_rate)
+                    self._graph_dict_tau[src_vertex][target_idx] += 1 - (1 / path_cost)
+                    pass
+
+
 
 

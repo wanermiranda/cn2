@@ -1,9 +1,9 @@
 import math
 import random
 import numpy as np
-BETA = 1
-ALPHA = 2
-
+BETA = 2
+ALPHA = 1
+MAX_STEPS_BACK = 10
 __author__ = 'Waner Miranda'
 __email__ = 'waner@dcc.ufmg.br'
 
@@ -14,16 +14,17 @@ class Ant:
         self._end = solver.get_end()
         self._solver = solver
         self._path = [solver.get_start()]
-        self._path_weight = 0.0
+        self._path_cost = 0.0
         self._moves_weight = 0.0
+        self._steps_back = 0
         self._vertex_visited = set(self._path)
         self._moves, self._weights, self._taus = [], [], []
 
     def get_position(self):
         return self._path[-1]
 
-    def get_path_weight(self):
-        return self._path_weight
+    def get_path_cost(self):
+        return self._path_cost
 
     def get_path(self):
         return self._path
@@ -58,8 +59,8 @@ class Ant:
         sum_factors = 0
         weighted_factors = []
         for pos in range(len(self._moves)):
-            weighted_eta = math.pow(self._weights[pos] / self._moves_weight, ALPHA)
-            weighted_tau = math.pow(self._taus[pos], BETA)
+            weighted_eta = math.pow(1 - (1 / self._weights[pos]), BETA)
+            weighted_tau = math.pow(self._taus[pos], ALPHA)
             factor = weighted_eta * weighted_tau
             sum_factors += factor
             weighted_factors.append(factor)
@@ -87,21 +88,23 @@ class Ant:
         vertex = self._moves[pos]
         self._vertex_visited.add(vertex)
         self._path.append(vertex)
-        self._path_weight += self._weights[pos]
-        print vertex, self._weights[pos], self._path_weight
+        self._path_cost += self._weights[pos]
+        # print vertex, self._weights[pos], self._path_weight
 
     def step_back(self):
-        last = self._path[-1]
-        second_last = self._path[-2]
-        weight = self._solver.get_weight(second_last, last)
+        # send the ant back home in case it is lost
+        if self._steps_back >= MAX_STEPS_BACK:
+            self.__init__(self._solver)
+        else:
+            self._steps_back += 1
+            last = self._path[-1]
+            second_last = self._path[-2]
+            weight = self._solver.get_weight(second_last, last)
 
-        if weight is None:
-            print "Error on step back"
+            assert weight is not None
+            self._path_cost -= weight
 
-        assert weight is not None
-        self._path_weight -= weight
-
-        self._vertex_visited.remove(last)
-        del self._path[-1]
+            self._vertex_visited.remove(last)
+            del self._path[-1]
 
 
