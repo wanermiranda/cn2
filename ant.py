@@ -33,7 +33,7 @@ class Ant:
         self._moves = []
         self.get_moves()
 
-        while len(self._moves) == 0:
+        while len(self._moves) < 2:
             self.step_back()
             self.get_moves()
 
@@ -59,7 +59,7 @@ class Ant:
         sum_factors = 0
         weighted_factors = []
         for pos in range(len(self._moves)):
-            weighted_eta = math.pow(1 - (1 / self._weights[pos]), BETA)
+            weighted_eta = math.pow(self._weights[pos] / self._moves_weight, BETA)
             weighted_tau = math.pow(self._taus[pos], ALPHA)
             factor = weighted_eta * weighted_tau
             sum_factors += factor
@@ -93,7 +93,7 @@ class Ant:
 
     def step_back(self):
         # send the ant back home in case it is lost
-        if self._steps_back >= MAX_STEPS_BACK:
+        if self._steps_back >= MAX_STEPS_BACK or len(self._path) < 2:
             self.__init__(self._solver)
         else:
             self._steps_back += 1
